@@ -9,7 +9,7 @@ Qiniu backup and restore tools.
 
 **Requires JDK 8 or above.**
 
-1. Download latest version
+1. Download [latest](http://on5rv61k7.bkt.clouddn.com/qiniu-backup/qiniu-backup-v0.0.1.zip) version
 2. Edit `application.properties`
 3. Run `java -jar <qiniu-backup-version>.jar --command=<command>`
 
