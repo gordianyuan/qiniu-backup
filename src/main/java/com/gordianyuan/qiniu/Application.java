@@ -14,21 +14,17 @@ public class Application {
 
   private static final Logger log = LoggerFactory.getLogger(Application.class);
 
-  private final QiniuBackup qiniuBackup;
-
-  private final QiniuRestore qiniuRestore;
-
-  private final QiniuCleanup qiniuCleanup;
-
-  private final QiniuConfiguration qiniuConfig;
+  @Autowired
+  private QiniuBackup qiniuBackup;
 
   @Autowired
-  public Application(QiniuBackup qiniuBackup, QiniuRestore qiniuRestore, QiniuCleanup qiniuCleanup, QiniuConfiguration qiniuConfig) {
-    this.qiniuBackup = qiniuBackup;
-    this.qiniuRestore = qiniuRestore;
-    this.qiniuCleanup = qiniuCleanup;
-    this.qiniuConfig = qiniuConfig;
-  }
+  private QiniuRestore qiniuRestore;
+
+  @Autowired
+  private QiniuDelete qiniuDelete;
+
+  @Autowired
+  private QiniuConfiguration qiniuConfig;
 
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
@@ -54,8 +50,8 @@ public class Application {
       case "restore":
         qiniuRestore.execute();
         break;
-      case "cleanup":
-        qiniuCleanup.execute();
+      case "delete":
+        qiniuDelete.execute();
         break;
       default:
         log.error("Bad command");

@@ -1,6 +1,6 @@
 package com.gordianyuan.qiniu;
 
-public interface QiniuCleanup {
+public interface QiniuDelete {
 
   void execute();
 

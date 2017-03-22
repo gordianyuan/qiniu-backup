@@ -1,27 +1,20 @@
 package com.gordianyuan.qiniu;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Strings;
 import com.google.common.io.Files;
-import com.qiniu.storage.BucketManager;
-import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import okhttp3.*;
 import okio.BufferedSink;
 import okio.Okio;
-import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBackup {
@@ -31,7 +24,7 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
   @Override
   public void execute() {
     checkEnvironment();
-    Map<String, QiniuFileInfo> fileInfos = getQiniuFiles();
+    Map<String, QiniuFileInfo> fileInfos = getQiniuFileInfos();
     if (!fileInfos.isEmpty()) {
       downloadFiles(fileInfos);
       saveDataToFile(fileInfos);
@@ -45,43 +38,7 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
     }
   }
 
-  private Map<String, QiniuFileInfo> getQiniuFiles() {
-    String bucket = qiniuConfig.getBucket();
-    String prefix = qiniuConfig.getPrefix();
-    BucketManager bucketManager = createBucketManager();
-    Map<String, QiniuFileInfo> allFileInfos = new ConcurrentHashMap<>();
-    BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(bucket, prefix);
-    while (fileListIterator.hasNext()) {
-      FileInfo[] fileInfos = fileListIterator.next();
-      allFileInfos.putAll(Stream.of(fileInfos).collect(Collectors.toMap(f -> f.key, this::createQiniuFile)));
-    }
-    printQiniuFilesSummary(allFileInfos);
-    return allFileInfos;
-  }
-
-  private QiniuFileInfo createQiniuFile(FileInfo fileInfo) {
-    QiniuFileInfo qiniuFile = new QiniuFileInfo();
-    qiniuFile.setKey(fileInfo.key);
-    qiniuFile.setHash(fileInfo.hash);
-    qiniuFile.setSize(fileInfo.fsize);
-    return qiniuFile;
-  }
-
-  private void printQiniuFilesSummary(Map<String, QiniuFileInfo> qiniuFiles) {
-    String bucket = qiniuConfig.getBucket();
-    String prefix = qiniuConfig.getPrefix();
-    if (Strings.isNullOrEmpty(prefix)) {
-      log.info("Found {} objects on bucket {}.", qiniuFiles.size(), bucket);
-    } else {
-      log.info("Found {} objects on bucket {} with prefix {}.", qiniuFiles.size(), bucket, prefix);
-    }
-
-    long totalFileSize = qiniuFiles.values().stream().parallel().mapToLong(QiniuFileInfo::getSize).sum();
-    log.info("Total objects size is {}.", FileUtils.byteCountToDisplaySize(totalFileSize));
-  }
-
   private void downloadFiles(Map<String, QiniuFileInfo> qiniuFiles) {
-
     CountDownLatch latch = new CountDownLatch(qiniuFiles.size());
     AtomicLong failCount = new AtomicLong();
     Stopwatch stopwatch = Stopwatch.createStarted();
