@@ -3,6 +3,7 @@ package com.gordianyuan.qiniu;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Configuration
@@ -17,7 +18,7 @@ public class QiniuConfiguration {
 
   private String secretKey;
 
-  private String baseDir = "/tmp/qiniu";
+  private String baseDir = "backup";
 
   private String command;
 
@@ -25,9 +26,9 @@ public class QiniuConfiguration {
 
   private String originalPrefix;
 
-  private static final String FILE_DIR = "/files";
+  private static final String FILE_DIR = "files";
 
-  private static final String DATA_FILE = "/data.json";
+  private static final String DATA_FILE = "data.json";
 
   public String getDomain() {
     return domain;
@@ -78,11 +79,15 @@ public class QiniuConfiguration {
   }
 
   public String getFileDir() {
-    return Paths.get(baseDir, FILE_DIR).toString();
+    Path baseDirPath = Paths.get(baseDir);
+    Path fileDirPath = baseDirPath.resolve(Paths.get(FILE_DIR));
+    return baseDirPath.toAbsolutePath().toString();
   }
 
   public String getDataFile() {
-    return Paths.get(baseDir, DATA_FILE).toString();
+    Path baseDirPath = Paths.get(baseDir);
+    Path dataFilePath = baseDirPath.resolve(Paths.get(DATA_FILE));
+    return dataFilePath.toAbsolutePath().toString();
   }
 
   public String getCommand() {

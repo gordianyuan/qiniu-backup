@@ -25,16 +25,19 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
   public void execute() {
     checkEnvironment();
     Map<String, QiniuFileInfo> fileInfos = getQiniuFileInfos();
-    if (!fileInfos.isEmpty()) {
-      downloadFiles(fileInfos);
-      saveDataToFile(fileInfos);
+    if (fileInfos.isEmpty()) {
+      log.info("No files need to be backup.");
+      return;
     }
+
+    downloadFiles(fileInfos);
+    saveDataToFile(fileInfos);
   }
 
   private void checkEnvironment() {
     String fileDir = qiniuConfig.getFileDir();
     if (isNotEmptyDirectory(Paths.get(fileDir))) {
-      throw new IllegalArgumentException(String.format("File Directory %s is not empty.", fileDir));
+      throw new IllegalArgumentException(String.format("File directory %s is not empty.", fileDir));
     }
   }
 
