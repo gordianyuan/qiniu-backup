@@ -1,10 +1,10 @@
 package com.gordianyuan.qiniu;
 
 import com.google.common.base.Strings;
-import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.model.FileInfo;
+import com.qiniu.util.Auth;
 import okhttp3.*;
 import okio.BufferedSink;
 import okio.Okio;
@@ -107,18 +107,31 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
       }
 
       @Override
-      public void onResponse(Call call, Response response) throws IOException {
-        try (BufferedSink sink = Okio.buffer(Okio.sink(filePath))) {
-          sink.writeAll(response.body().source());
+      public void onResponse(Call call, Response response) {
+        try {
+          if (response.isSuccessful()) {
+            try (BufferedSink sink = Okio.buffer(Okio.sink(filePath))) {
+              sink.writeAll(response.body().source());
+            }
+            log.info("Succeed to download {}", fileKey);
+            file.setDownloadStatus(QiniuFileInfo.DownloadStatus.SUCCEED);
+          } else {
+            log.error("Failed to download {}, code: {}, message: {}", fileKey, response.code(), response.message());
+            file.setDownloadStatus(QiniuFileInfo.DownloadStatus.FAILED);
+          }
+        } catch (IOException e) {
+          log.error("Failed to download " + fileKey, e);
+          file.setDownloadStatus(QiniuFileInfo.DownloadStatus.FAILED);
         } finally {
-          Closeables.close(response, true);
+          response.body().close();
+          latch.countDown();
         }
-
-        file.setDownloadStatus(QiniuFileInfo.DownloadStatus.SUCCEED);
-        log.info("Succeed to download {}", fileKey);
-        latch.countDown();
       }
     });
+  }
+
+  private Auth createAuth() {
+    return Auth.create(qiniuConfig.getAccessKey(), qiniuConfig.getSecretKey());
   }
 
   private Path getFilePath(String key) {
@@ -137,8 +150,9 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
   }
 
   private Request createRequest(String key) {
-    String url = "http://" + qiniuConfig.getDomain() + "/" + key;
-    return new Request.Builder().url(url).build();
+    String publicUrl = "http://" + qiniuConfig.getDomain() + "/" + key;
+    String privateUrl = createAuth().privateDownloadUrl(publicUrl);
+    return new Request.Builder().url(privateUrl).build();
   }
 
 }
