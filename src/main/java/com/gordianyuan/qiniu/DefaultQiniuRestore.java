@@ -63,8 +63,8 @@ public class DefaultQiniuRestore extends AbstractQiniuSupport implements QiniuRe
   }
 
   private String getNewFileKey(String fileKey) {
-    String newKey = StringUtils.removeStart(fileKey, qiniuConfig.getBackupPrefix());
-    return Strings.nullToEmpty(qiniuConfig.getRestorePrefix()) + newKey;
+    String newFileKey = StringUtils.removeStart(fileKey, qiniuConfig.getOriginalPrefix());
+    return Strings.nullToEmpty(qiniuConfig.getPrefix()) + newFileKey;
   }
 
   private UploadManager createUploadManager() {

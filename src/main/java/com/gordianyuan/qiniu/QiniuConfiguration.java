@@ -17,13 +17,13 @@ public class QiniuConfiguration {
 
   private String secretKey;
 
-  private String backupPrefix;
-
-  private String restorePrefix;
-
   private String baseDir = "/tmp/qiniu";
 
   private String command;
+
+  private String prefix;
+
+  private String originalPrefix;
 
   private static final String FILE_DIR = "/files";
 
@@ -61,20 +61,12 @@ public class QiniuConfiguration {
     this.secretKey = secretKey;
   }
 
-  public String getBackupPrefix() {
-    return backupPrefix;
+  public String getPrefix() {
+    return prefix;
   }
 
-  public void setBackupPrefix(String backupPrefix) {
-    this.backupPrefix = backupPrefix;
-  }
-
-  public String getRestorePrefix() {
-    return restorePrefix;
-  }
-
-  public void setRestorePrefix(String restorePrefix) {
-    this.restorePrefix = restorePrefix;
+  public void setPrefix(String prefix) {
+    this.prefix = prefix;
   }
 
   public String getBaseDir() {
@@ -99,6 +91,14 @@ public class QiniuConfiguration {
 
   public void setCommand(String command) {
     this.command = command;
+  }
+
+  public String getOriginalPrefix() {
+    return originalPrefix;
+  }
+
+  public void setOriginalPrefix(String originalPrefix) {
+    this.originalPrefix = originalPrefix;
   }
 
 }

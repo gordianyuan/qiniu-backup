@@ -47,7 +47,7 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
 
   private Map<String, QiniuFileInfo> getQiniuFiles() {
     String bucket = qiniuConfig.getBucket();
-    String prefix = qiniuConfig.getBackupPrefix();
+    String prefix = qiniuConfig.getPrefix();
     BucketManager bucketManager = createBucketManager();
     Map<String, QiniuFileInfo> allFileInfos = new ConcurrentHashMap<>();
     BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(bucket, prefix);
@@ -69,7 +69,7 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
 
   private void printQiniuFilesSummary(Map<String, QiniuFileInfo> qiniuFiles) {
     String bucket = qiniuConfig.getBucket();
-    String prefix = qiniuConfig.getBackupPrefix();
+    String prefix = qiniuConfig.getPrefix();
     if (Strings.isNullOrEmpty(prefix)) {
       log.info("Found {} objects on bucket {}.", qiniuFiles.size(), bucket);
     } else {
