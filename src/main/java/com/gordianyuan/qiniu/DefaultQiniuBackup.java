@@ -1,5 +1,6 @@
 package com.gordianyuan.qiniu;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import com.qiniu.storage.BucketManager;
@@ -80,8 +81,11 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
   }
 
   private void downloadFiles(Map<String, QiniuFileInfo> qiniuFiles) {
+
     CountDownLatch latch = new CountDownLatch(qiniuFiles.size());
     AtomicLong failCount = new AtomicLong();
+    Stopwatch stopwatch = Stopwatch.createStarted();
+
     qiniuFiles.values().forEach(file -> downloadFile(file, latch, failCount));
 
     try {
@@ -90,14 +94,17 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
       log.error(e.getMessage(), e);
       throw new RuntimeException(e);
     }
-    log.info("Download finished. Total: {}, Failed: {}", qiniuFiles.size(), failCount.longValue());
+
+    log.info("Download finished. Total: {}, Failed: {}. Time elapsed: {}.",
+        qiniuFiles.size(), failCount.longValue(), stopwatch);
   }
 
   private void downloadFile(QiniuFileInfo file, CountDownLatch latch, AtomicLong failCount) {
     String fileKey = file.getKey();
+    log.info("Start download {}", fileKey);
+
     Path filePath = getFilePath(fileKey);
     Request request = createRequest(fileKey);
-
     httpClient.newCall(request).enqueue(new Callback() {
       @Override
       public void onFailure(Call call, IOException e) {
@@ -113,7 +120,8 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
             try (BufferedSink sink = Okio.buffer(Okio.sink(filePath))) {
               sink.writeAll(response.body().source());
             }
-            log.info("Succeed to download {}", fileKey);
+            long elapsed = System.currentTimeMillis() - response.sentRequestAtMillis();
+            log.info("Succeed to download {}, took {} ms.", fileKey, elapsed);
             file.setDownloadStatus(QiniuFileInfo.DownloadStatus.SUCCEED);
           } else {
             log.error("Failed to download {}, code: {}, message: {}", fileKey, response.code(), response.message());
