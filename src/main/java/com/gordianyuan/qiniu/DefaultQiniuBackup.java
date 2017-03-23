@@ -61,8 +61,6 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
 
   private void downloadFile(QiniuFileInfo file, CountDownLatch latch, AtomicLong failCount) {
     String fileKey = file.getKey();
-    log.info("Start download {}", fileKey);
-
     Path filePath = getFilePath(fileKey);
     Request request = createRequest(fileKey);
     httpClient.newCall(request).enqueue(new Callback() {

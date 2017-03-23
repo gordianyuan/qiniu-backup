@@ -46,13 +46,10 @@ public class DefaultQiniuRestore extends AbstractQiniuSupport implements QiniuRe
   }
 
   private void uploadFile(String fileKey, File file, CountDownLatch latch, AtomicLong failCount) {
-    log.info("Start upload {}", fileKey);
-
     UploadManager uploadManager = createUploadManager();
     String updateToken = createUploadToken();
     String newFileKey = getNewFileKey(fileKey);
     Stopwatch stopwatch = Stopwatch.createStarted();
-
     try {
       uploadManager.put(file, newFileKey, updateToken);
       log.info("Succeed to upload {}, took {} ms", newFileKey, stopwatch.elapsed(TimeUnit.MILLISECONDS));
