@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.model.FileInfo;
@@ -72,7 +73,7 @@ public class AbstractQiniuSupport {
     log.info("Start loading data file.");
     Map<String, QiniuFileInfo> qiniuFiles = ImmutableMap.of();
     ObjectMapper objectMapper = new ObjectMapper();
-    File dataFile = Paths.get(qiniuConfig.getDataFile()).toFile();
+    File dataFile = Paths.get(qiniuConfig.getAbsoluteDataFile()).toFile();
     try {
       qiniuFiles = objectMapper.readValue(dataFile, new TypeReference<Map<String, QiniuFileInfo>>() {
       });
@@ -85,9 +86,10 @@ public class AbstractQiniuSupport {
 
   protected void saveDataToFile(Map<String, QiniuFileInfo> qiniuFiles) {
     log.info("Start write data file.");
-    File dataFile = Paths.get(qiniuConfig.getDataFile()).toFile();
+    File dataFile = Paths.get(qiniuConfig.getAbsoluteDataFile()).toFile();
     ObjectMapper objectMapper = new ObjectMapper();
     try {
+      Files.createParentDirs(dataFile);
       objectMapper.writeValue(dataFile, qiniuFiles);
     } catch (IOException e) {
       throw new RuntimeException(e);

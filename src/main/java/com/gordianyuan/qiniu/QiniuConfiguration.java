@@ -1,14 +1,20 @@
 package com.gordianyuan.qiniu;
 
+import com.google.common.base.Strings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Configuration
 @ConfigurationProperties
 public class QiniuConfiguration {
+
+  private static final String DEFAULT_BASE_DIR = "backup";
+
+  private static final String DEFAULT_FILE_DIR = "files";
+
+  private static final String DEFAULT_DATA_FILE = "data.json";
 
   private String domain;
 
@@ -18,17 +24,17 @@ public class QiniuConfiguration {
 
   private String secretKey;
 
-  private String baseDir = "backup";
+  private String baseDir = DEFAULT_BASE_DIR;
+
+  private String fileDir = DEFAULT_FILE_DIR;
+
+  private String dataFile = DEFAULT_DATA_FILE;
 
   private String command;
 
   private String prefix;
 
   private String originalPrefix;
-
-  private static final String FILE_DIR = "files";
-
-  private static final String DATA_FILE = "data.json";
 
   public String getDomain() {
     return domain;
@@ -79,15 +85,23 @@ public class QiniuConfiguration {
   }
 
   public String getFileDir() {
-    Path baseDirPath = Paths.get(baseDir);
-    Path fileDirPath = baseDirPath.resolve(Paths.get(FILE_DIR));
-    return baseDirPath.toAbsolutePath().toString();
+    return fileDir;
   }
 
-  public String getDataFile() {
-    Path baseDirPath = Paths.get(baseDir);
-    Path dataFilePath = baseDirPath.resolve(Paths.get(DATA_FILE));
-    return dataFilePath.toAbsolutePath().toString();
+  public void setFileDir(String fileDir) {
+    this.fileDir = Strings.isNullOrEmpty(fileDir) ? DEFAULT_FILE_DIR : fileDir;
+  }
+
+  public String getAbsoluteFileDir() {
+    if (fileDir.startsWith("/")) {
+      return Paths.get(fileDir).toAbsolutePath().toString();
+    } else {
+      return Paths.get(baseDir, fileDir).toAbsolutePath().toString();
+    }
+  }
+
+  public String getAbsoluteDataFile() {
+    return Paths.get(baseDir, dataFile).toAbsolutePath().toString();
   }
 
   public String getCommand() {

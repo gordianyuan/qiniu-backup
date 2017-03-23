@@ -26,7 +26,7 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
     checkEnvironment();
     Map<String, QiniuFileInfo> fileInfos = getQiniuFileInfos();
     if (fileInfos.isEmpty()) {
-      log.info("No files need to be backup.");
+      log.info("No files need to backup.");
       return;
     }
 
@@ -35,7 +35,7 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
   }
 
   private void checkEnvironment() {
-    String fileDir = qiniuConfig.getFileDir();
+    String fileDir = qiniuConfig.getAbsoluteFileDir();
     if (isNotEmptyDirectory(Paths.get(fileDir))) {
       throw new IllegalArgumentException(String.format("File directory %s is not empty.", fileDir));
     }
@@ -103,7 +103,7 @@ public class DefaultQiniuBackup extends AbstractQiniuSupport implements QiniuBac
   }
 
   private Path getFilePath(String key) {
-    Path path = Paths.get(qiniuConfig.getFileDir(), key);
+    Path path = Paths.get(qiniuConfig.getAbsoluteFileDir(), key);
     try {
       Files.createParentDirs(path.toFile());
     } catch (IOException e) {
