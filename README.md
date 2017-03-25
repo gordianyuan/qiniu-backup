@@ -39,13 +39,17 @@ bucket=blog
 
 ### backup（批量下载七牛文件到本地）
 
-`java -jar qiniu-backup.jar --command=backup [--prefix=<prefix>]`
+```bash
+java -jar qiniu-backup.jar --command=backup [--prefix=<prefix>]
+```
 
 - `prefix`：七牛文件路径前缀，默认为空
 
 ### restore（批量上传本地文件到七牛）
 
-`java -jar qiniu-backup.jar --command=restore [--prefix=<prefix>] [--original-prefix=<original-prefix>] [--file-dir=<file-dir>]`
+```bash
+java -jar qiniu-backup.jar --command=restore [--prefix=<prefix>] [--original-prefix=<original-prefix>] [--file-dir=<file-dir>]
+```
 
 - `prefix`：七牛文件路径前缀，默认为空
 - `original-prefix`: 七牛文件原前缀，默认为空
@@ -53,7 +57,9 @@ bucket=blog
 
 ### delete（批量删除七牛文件）
 
-`java -jar qiniu-backup.jar --command=delete [--prefix=<prefix>]`
+```bash
+java -jar qiniu-backup.jar --command=delete [--prefix=<prefix>]
+```
 
 - `prefix`：七牛文件路径前缀，默认为空
 
