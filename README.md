@@ -10,7 +10,7 @@
 
 **需要 JDK 8 或以上版本**
 
-1. 下载 [程序](http://on5rv61k7.bkt.clouddn.com/qiniu-backup/qiniu-backup-v0.0.1.zip) 并解压。
+1. 下载 [程序](http://on5rv61k7.bkt.clouddn.com/qiniu-backup/qiniu-backup-v0.1.0.zip) 并解压。
 2. 编辑 `application.properties`，修改配置项。
 3. 打开控制台，执行命令 `java -jar qiniu-backup.jar --command=<command> [--prefix=<prefix>]`
 
